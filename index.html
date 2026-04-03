@@ -76,7 +76,8 @@
 
         /* --- 第五幕 (Part 5) 老鼠惊喜 --- */
         .mouse-page { z-index: 20; background-color: #ded3c5; }
-        .walking-mouse { position: absolute; left: -200px; top: 50%; transform: translateY(-50%); width: 150px; animation: walk-in 2s linear forwards; }
+        /* 【BUG修复】删除了这里的 animation 属性 */
+        .walking-mouse { position: absolute; left: -200px; top: 50%; transform: translateY(-50%); width: 150px; }
         @keyframes walk-in { to { left: 50%; transform: translate(-50%, -50%); } }
         .walking-mouse.wobble { animation: walk-in 2s linear forwards, wobble-effect 0.3s infinite linear; }
         @keyframes wobble-effect { 0%, 100% { transform: translate(-50%, -50%) rotate(-5deg); } 50% { transform: translate(-50%, -50%) rotate(5deg); } }
@@ -501,3 +502,4 @@
     </script>
 </body>
 </html>
+✓ 已复
