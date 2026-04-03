@@ -76,7 +76,6 @@
 
         /* --- 第五幕 (Part 5) 老鼠惊喜 --- */
         .mouse-page { z-index: 20; background-color: #ded3c5; }
-        /* 【BUG修复】删除了这里的 animation 属性 */
         .walking-mouse { position: absolute; left: -200px; top: 50%; transform: translateY(-50%); width: 150px; }
         @keyframes walk-in { to { left: 50%; transform: translate(-50%, -50%); } }
         .walking-mouse.wobble { animation: walk-in 2s linear forwards, wobble-effect 0.3s infinite linear; }
@@ -362,11 +361,15 @@
             const walkingMouse = document.getElementById('walking-mouse');
             const jumpscareMouse = document.getElementById('jumpscare-mouse');
             walkingMouse.classList.add('wobble');
-            walkingMouse.addEventListener('animationend', () => {
-                walkingMouse.style.display = 'none';
-                jumpscareMouse.classList.add('show');
-                jumpscareMouse.addEventListener('animationend', () => { goToPart6(); }, { once: true });
-            }, { once: true });
+            
+            // 【BUG修复】只监听走路动画的结束，忽略无限循环的摇摆动画
+            walkingMouse.addEventListener('animationend', (event) => {
+                if (event.animationName === 'walk-in') {
+                    walkingMouse.style.display = 'none';
+                    jumpscareMouse.classList.add('show');
+                    jumpscareMouse.addEventListener('animationend', () => { goToPart6(); }, { once: true });
+                }
+            });
         }
         let scene6Started = false;
         function goToPart6() {
@@ -502,4 +505,3 @@
     </script>
 </body>
 </html>
-✓ 已复
