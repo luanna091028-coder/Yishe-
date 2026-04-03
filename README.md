@@ -1,2 +1,504 @@
 # Yishe-
-Birthday card but online
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>给依舍的生日惊喜</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 全局样式 --- */
+        body, html { margin: 0; padding: 0; background-color: #f0f0f0; font-family: 'Noto Serif SC', serif; }
+        .page-container { width: 100vw; max-width: 420px; height: 100vh; margin: 0 auto; position: relative; overflow: hidden; }
+        .page { width: 100%; height: 100%; position: absolute; top: 0; left: 0; box-sizing: border-box; background: #ded3c5 url("https://www.transparenttextures.com/patterns/natural-paper.png"); display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease-out; }
+        .page.hidden { opacity: 0; pointer-events: none; }
+
+        /* --- 封面 (Part 1) --- */
+        .cover { padding: 120px 40px; z-index: 10; transition: transform 1.2s cubic-bezier(0.7, 0, 0.3, 1); flex-direction: column; align-items: flex-start; }
+        .cover.hidden { transform: translateY(-100%); }
+        .title-line { font-family: 'Ma Shan Zheng', cursive; font-size: 48px; background: linear-gradient(135deg, #C5A059, #F1D38E, #C5A059); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.5; display: flex; align-items: center; flex-wrap: wrap; }
+        .inline-seal { height: 50px; width: 50px; margin-left: 8px; mix-blend-mode: multiply; transform: rotate(-3deg) translateY(4px); vertical-align: middle; }
+        .subtitle { font-size: 17px; color: #1a1a1a; margin: 30px 0 0 5px; }
+        .cover-btn { position: absolute; bottom: 80px; right: 40px; padding: 8px 16px; background: transparent; font-size: 11px; text-decoration: none; color: #1a1a1a; border-bottom: 1px solid #1a1a1a; z-index: 20; animation: subtleFade 3s infinite ease-in-out; cursor: pointer; }
+        @keyframes subtleFade { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .cover-emoji { position: absolute; width: 24px; height: 24px; z-index: 1; opacity: 0.35; animation: float 6s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* --- 第二页 (Part 2) --- */
+        .scene { z-index: 5; }
+        .text-wrapper { position: absolute; top: 20%; left: 50%; transform: translateX(-50%); width: 80%; text-align: center; }
+        .main-text { font-size: 40px; font-weight: 700; color: #1a1a1a; position: relative; overflow: hidden; display: inline-block; visibility: hidden; }
+        .main-text.wipe-out { animation: wipe-out-effect 0.8s forwards 0.2s; }
+        @keyframes wipe-out-effect { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 100% 0 0); } }
+        .rainbow-cursor { position: absolute; top: 0; left: 0; font-size: 40px; opacity: 0; }
+        .rainbow-cursor.animate-in { opacity: 1; animation: rush-in 1s forwards; }
+        .rainbow-cursor.animate-out { opacity: 1; animation: rush-out 0.8s forwards 0.2s; }
+        @keyframes rush-in { from { transform: translateX(0); } to { transform: translateX(250px); } }
+        @keyframes rush-out { from { transform: translateX(250px); } to { transform: translateX(0); } }
+        .firework { position: absolute; font-size: 60px; opacity: 0; transform: scale(0); }
+        .firework.explode { opacity: 1; animation: explode-effect 0.5s forwards; }
+        @keyframes explode-effect { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+        .oc-image-1 { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 70%; background: #fff; padding: 10px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); opacity: 0; }
+        .oc-image-1 img { width: 100%; display: block; }
+        .oc-image-1.slam { animation: slam-effect 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes slam-effect { 0% { transform: translate(-50%, -50%) scale(2); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1) rotate(-3deg); opacity: 1; } }
+        .slide-in-group { position: absolute; top: 55%; left: 50%; width: 70%; transform: translate(150%, -50%); transition: transform 1.5s ease-out; }
+        .slide-in-group.active { transform: translate(-50%, -50%); }
+        .oc-image-2 { width: 100%; background: #fff; padding: 10px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); transform: rotate(3deg); }
+        .oc-image-2 img { width: 100%; display: block; }
+        .andy-lau { position: absolute; bottom: -20px; right: -30px; width: 80px; z-index: 1; transform: rotate(15deg); cursor: pointer; }
+        .andy-lau.swaying { animation: sway-effect 0.8s infinite ease-in-out; }
+        @keyframes sway-effect { 0% { transform: rotate(5deg); } 50% { transform: rotate(25deg); } 100% { transform: rotate(5deg); } }
+        .andy-lau img { width: 100%; }
+
+        /* --- 墨染黑夜效果 (Part 3) --- */
+        .ink-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #2c3e50; z-index: 15; clip-path: circle(0% at 50% 0%); pointer-events: none; }
+        .ink-overlay.spread { animation: ink-spread 1.5s cubic-bezier(0.6, 0, 0.4, 1) forwards; }
+        @keyframes ink-spread { to { clip-path: circle(150% at 50% 0%); } }
+
+        /* --- 第三页 (Part 3) 卡牌秀 --- */
+        .card-stack-page { z-index: 16; background-color: transparent; }
+        .moon-background { position: absolute; top: 40px; left: 30px; font-size: 40px; opacity: 0; animation: fade-in 1s forwards 1s; }
+        @keyframes fade-in { to { opacity: 0.7; } }
+        .swipe-hint { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; color: rgba(255, 255, 255, 0.7); font-size: 12px; opacity: 0; transition: opacity 1s; z-index: 20; }
+        .swipe-hint.visible { opacity: 1; }
+        .card-swiper { position: relative; width: 100%; height: 100%; }
+        .card-item { position: absolute; top: 50%; left: 45%; width: 85%; aspect-ratio: 16 / 9; transform: translate(-50%, -50%) scale(0.9); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #000; transition: transform 0.5s ease-out, opacity 0.5s ease-out; opacity: 0; }
+
+        /* --- 第四页 (Part 4) --- */
+        .final-page { z-index: 17; background-color: #2c3e50; flex-direction: column; }
+        .avatar-image { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #C5A059; box-shadow: 0 0 20px rgba(197, 160, 89, 0.7); transform: translateX(-120%); transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1); }
+        .avatar-image.slide-in { transform: translateX(0); }
+        .final-title-wrapper { position: relative; margin-top: 30px; }
+        .final-title { font-family: 'Ma Shan Zheng', cursive; font-size: 48px; color: #C5A059; min-height: 50px; }
+        .writing-hand { position: absolute; top: 5px; left: 0; font-size: 40px; visibility: hidden; animation: tremble 0.1s infinite; }
+        @keyframes tremble { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+        .final-subtitle { font-size: 18px; color: #ded3c5; margin-top: 15px; opacity: 0; transition: opacity 1s ease-out 0.5s; }
+
+        /* --- 第五幕 (Part 5) 老鼠惊喜 --- */
+        .mouse-page { z-index: 20; background-color: #ded3c5; }
+        .walking-mouse { position: absolute; left: -200px; top: 50%; transform: translateY(-50%); width: 150px; animation: walk-in 2s linear forwards; }
+        @keyframes walk-in { to { left: 50%; transform: translate(-50%, -50%); } }
+        .walking-mouse.wobble { animation: walk-in 2s linear forwards, wobble-effect 0.3s infinite linear; }
+        @keyframes wobble-effect { 0%, 100% { transform: translate(-50%, -50%) rotate(-5deg); } 50% { transform: translate(-50%, -50%) rotate(5deg); } }
+        .jumpscare-mouse { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(2); width: 100%; opacity: 0; pointer-events: none; }
+        .jumpscare-mouse.show { animation: jumpscare-effect 0.75s forwards; }
+        @keyframes jumpscare-effect { 0% { opacity: 1; transform: translate(-50%, -50%) scale(2.2); } 80% { opacity: 1; transform: translate(-50%, -50%) scale(2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); } }
+
+        /* --- 第六幕 (Part 6) 深情告白 --- */
+        .confession-page { z-index: 25; background-color: #1a1a1a; flex-direction: column; }
+        .slideshow-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s ease-in-out; }
+        .slideshow-bg.visible { opacity: 0.3; }
+        .confession-wrapper { position: relative; width: 80%; text-align: center; }
+        .confession-text { font-family: 'Noto Serif SC', serif; font-size: 28px; color: #ded3c5; min-height: 40px; line-height: 1.5; display: inline-block; }
+        .writing-cursor { position: absolute; top: 8px; left: 0; height: 30px; visibility: hidden; animation: tremble 0.1s infinite; }
+
+        /* --- 第七幕 (Part 7) 最终章 --- */
+        .final-curtain-page { z-index: 30; flex-direction: column; }
+        .slide-out-up { animation: slide-out-up-effect 1.5s forwards; }
+        @keyframes slide-out-up-effect { to { transform: translateY(-100%); opacity: 0; } }
+        .sun-emoji { position: absolute; top: 100%; font-size: 80px; animation: sun-rise-and-fade 2.5s forwards; }
+        @keyframes sun-rise-and-fade { 0% { top: 100%; opacity: 1; } 40% { top: 15%; } 60% { top: 15%; } 100% { top: -20%; opacity: 0; } }
+        .final-text-wrapper { width: 80%; text-align: center; color: #1a1a1a; font-size: 18px; line-height: 1.8; clip-path: inset(100% 0 0 0); animation: text-wipe-in 0.5s forwards 2s; }
+        @keyframes text-wipe-in { to { clip-path: inset(0 0 0 0); } }
+        .final-text-wrapper span { display: inline-block; }
+        .wind-blow-char { animation: wind-blow-effect 1s forwards; }
+        @keyframes wind-blow-effect { to { transform: translateY(-80px) translateX(var(--random-x)) rotate(var(--random-r)); opacity: 0; } }
+        .play-voice-btn { font-size: 60px; cursor: pointer; opacity: 0; transform: scale(0.5); transition: opacity 0.5s, transform 0.5s; }
+        .play-voice-btn.visible { opacity: 1; transform: scale(1); }
+        .easter-egg-star { position: absolute; bottom: 20px; right: 20px; font-size: 24px; cursor: pointer; transition: transform 0.2s; }
+        .easter-egg-star:hover { transform: scale(1.2); }
+        .easter-egg-image-popup { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; padding: 10px; background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .easter-egg-image-popup img { width: 100%; display: block; }
+        .easter-egg-image-popup.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- ==================== 封面 (Part 1) ==================== -->
+        <div class="page cover" id="part1">
+            <div class="text-group">
+                <div class="title-line">生日快乐！</div>
+                <div class="title-line">
+                    — 我亲爱的 
+                    <img src="./yishe.jpeg" class="inline-seal">
+                </div>
+                <div class="subtitle" id="final-subtitle-text">难绷儿</div>
+            </div>
+            <a class="cover-btn" onclick="startShow()">进入下一篇章 —></a>
+        </div>
+
+        <!-- ==================== 第二页 (Part 2) ==================== -->
+        <div class="page scene hidden" id="part2">
+            <audio id="bgm" src="https://files.catbox.moe/g9eurk.m4a" loop></audio>
+            <div class="text-wrapper" id="text-wrapper">
+                <div class="main-text" id="main-text">宝宝们!!!</div>
+                <div class="rainbow-cursor" id="rainbow">🌈</div>
+                <div class="firework" id="firework">🎉</div>
+            </div>
+            <div class="oc-image-1" id="oc1">
+                <img src="./mmexport1774696284341.jpeg" alt="OC 1">
+            </div>
+            <div class="slide-in-group" id="slide-group">
+                <div class="oc-image-2">
+                    <img src="./mmexport1774696153575.jpeg" alt="OC 2">
+                </div>
+                <div class="andy-lau" id="andy">
+                    <img src="./images.jpeg" alt="Andy Lau">
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 第三页 (Part 3) ==================== -->
+        <div class="ink-overlay" id="ink-overlay"></div>
+        <div class="page card-stack-page hidden" id="part3">
+            <div class="moon-background">🌙</div>
+            <div class="swipe-hint" id="swipe-hint">手指🔽滑动👈</div>
+            <div class="card-swiper" id="swiper">
+                <div class="card-item" style="background-image: url('./IMG_5434.png');"></div>
+                <div class="card-item" style="background-image: url('./IMG_5436.png');"></div>
+                <div class="card-item" style="background-image: url('./IMG_5435.png');"></div>
+                <div class="card-item" style="background-image: url('./IMG_5432.png');"></div>
+            </div>
+        </div>
+
+        <!-- ==================== 第四页 (Part 4) ==================== -->
+        <div class="page final-page hidden" id="part4">
+            <audio id="writing-sfx" src="https://files.catbox.moe/m14tjw.mp3" loop></audio>
+            <img src="./mmexport1774696112562.jpeg" class="avatar-image" id="avatar">
+            <div class="final-title-wrapper">
+                <div class="final-title" id="final-title"></div>
+                <div class="writing-hand" id="hand">✍️</div>
+            </div>
+            <div class="final-subtitle" id="final-subtitle">4月25日</div>
+        </div>
+
+        <!-- ==================== 第五幕 (Part 5) ==================== -->
+        <div class="page mouse-page hidden" id="part5">
+            <img src="./IMG_5437.jpeg" class="walking-mouse" id="walking-mouse">
+            <img src="./IMG_5438.jpeg" class="jumpscare-mouse" id="jumpscare-mouse">
+        </div>
+
+        <!-- ==================== 第六幕 (Part 6) ==================== -->
+        <div class="page confession-page hidden" id="part6">
+            <div id="slideshow" class="slideshow-bg"></div>
+            <div class="confession-wrapper">
+                <div class="confession-text" id="confession-text"></div>
+                <img src="./Screenshot_20260328_121319_com_tencent_mm_WxaLiteAppLiteUI.jpeg" class="writing-cursor" id="writing-cursor">
+            </div>
+            <audio id="typing-sfx" src="https://files.catbox.moe/m14tjw.mp3" loop></audio>
+        </div>
+
+        <!-- ==================== 第七幕 (Part 7) ==================== -->
+        <div class="page final-curtain-page hidden" id="part7">
+            <div class="sun-emoji" id="sun-emoji">☀️</div>
+            <div class="final-text-wrapper" id="final-text-wrapper">
+                本来我只是想说一个生日快乐的，但是说着说着我发现我有很多话想对你说。<br>
+                我还希望能陪你过接下来许多的生日，好吗？
+            </div>
+            <div class="play-voice-btn" id="play-voice-btn">🎤</div>
+            <audio id="final-voice" src="./daisy.m4a"></audio>
+            <div class="easter-egg-star" id="easter-egg-star">✨</div>
+            <div class="easter-egg-image-popup" id="easter-egg-image-popup">
+                <img id="easter-egg-img" src="">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 全局变量和元素获取 ---
+        const part1 = document.getElementById('part1');
+        const part2 = document.getElementById('part2');
+        const part3 = document.getElementById('part3');
+        const part4 = document.getElementById('part4');
+        const part5 = document.getElementById('part5');
+        const part6 = document.getElementById('part6');
+        const part7 = document.getElementById('part7');
+
+        // --- Part 1 & 2 逻辑 ---
+        let showStarted = false;
+        function startShow() {
+            if (showStarted) return;
+            showStarted = true;
+            part1.classList.add('hidden');
+            part2.classList.remove('hidden');
+            playScene2();
+        }
+        function playScene2() {
+            const mainText = document.getElementById('main-text');
+            const rainbow = document.getElementById('rainbow');
+            const firework = document.getElementById('firework');
+            const oc1 = document.getElementById('oc1');
+            const slideGroup = document.getElementById('slide-group');
+            const andy = document.getElementById('andy');
+            const bgm = document.getElementById('bgm');
+            mainText.style.visibility = 'visible';
+            rainbow.classList.add('animate-in');
+            rainbow.addEventListener('animationend', () => {
+                rainbow.style.opacity = '0';
+                firework.style.left = '250px';
+                firework.classList.add('explode');
+                rainbow.classList.remove('animate-in');
+                rainbow.classList.add('animate-out');
+                mainText.classList.add('wipe-out');
+                oc1.classList.add('slam');
+            }, { once: true });
+            oc1.addEventListener('animationend', () => {
+                setTimeout(() => {
+                    slideGroup.classList.add('active');
+                    bgm.volume = 0;
+                    bgm.play().catch(e => console.log("BGM播放失败"));
+                    let fadeAudio = setInterval(() => {
+                        if (bgm.volume < 0.9) { bgm.volume = Math.min(bgm.volume + 0.1, 1); } 
+                        else { clearInterval(fadeAudio); }
+                    }, 150);
+                    setTimeout(() => { andy.classList.add('swaying'); }, 1500);
+                    setTimeout(goToPart3, 3000);
+                }, 1000);
+            }, { once: true });
+            andy.addEventListener('click', () => {
+                if (bgm.paused) { bgm.play(); andy.classList.add('swaying'); } 
+                else { bgm.pause(); andy.classList.remove('swaying'); }
+            });
+        }
+        const coverPage = document.getElementById('part1');
+        const appleEmojiBase = "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.0.1/img/apple/64/";
+        const emojiCodes = ["1f973", "1f970", "1f382", "1f389", "1f38a"];
+        function isSafeForCover(x, y) { if (y < 350) return false; if (x > coverPage.offsetWidth - 200 && y > coverPage.offsetHeight - 180) return false; return true; }
+        for (let i = 0; i < 12; i++) { let x = Math.random() * (coverPage.offsetWidth - 40) + 20; let y = Math.random() * (coverPage.offsetHeight - 40) + 20; if (isSafeForCover(x, y)) { const img = document.createElement('img'); img.src = `${appleEmojiBase}${emojiCodes[Math.floor(Math.random() * emojiCodes.length)]}.png`; img.className = 'cover-emoji'; img.style.left = x + 'px'; img.style.top = y + 'px'; img.style.animationDelay = Math.random() * 5 + 's'; coverPage.appendChild(img); } }
+
+        // --- Part 3 & 4 逻辑 ---
+        let scene3Started = false;
+        function goToPart3() {
+            if (scene3Started) return;
+            scene3Started = true;
+            part2.classList.add('hidden');
+            document.getElementById('ink-overlay').classList.add('spread');
+            part3.classList.remove('hidden');
+            playScene3();
+        }
+        function playScene3() {
+            const swiper = document.getElementById('swiper');
+            const cards = Array.from(swiper.children);
+            let currentIndex = 0;
+            let swipedCards = new Set([0]);
+            function setupCards() {
+                cards.forEach((card, index) => {
+                    card.style.opacity = (index === 0) ? '1' : '0';
+                    card.style.transform = (index === 0) ? 'translate(-50%, -50%) scale(1)' : 'translate(-50%, -50%) scale(0.9)';
+                    card.style.zIndex = cards.length - index;
+                });
+                setTimeout(() => { document.getElementById('swipe-hint').classList.add('visible'); }, 1500);
+            }
+            setupCards();
+            let touchStartY = 0;
+            swiper.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; });
+            swiper.addEventListener('touchend', e => {
+                document.getElementById('swipe-hint').classList.add('hidden');
+                let touchEndY = e.changedTouches[0].clientY;
+                if (Math.abs(touchStartY - touchEndY) < 50) return;
+                let lastIndex = currentIndex;
+                let direction = (touchStartY > touchEndY) ? 'up' : 'down';
+                if (direction === 'up') { currentIndex = (currentIndex + 1) % cards.length; cards[lastIndex].style.transform = 'translate(-50%, -150%) rotate(-15deg)'; } 
+                else { currentIndex = (currentIndex - 1 + cards.length) % cards.length; cards[lastIndex].style.transform = 'translate(-50%, 50%) rotate(15deg)'; }
+                cards.forEach((card, index) => {
+                    card.style.opacity = (index === currentIndex) ? '1' : '0';
+                    card.style.transform = (index === currentIndex) ? 'translate(-50%, -50%) scale(1)' : 'translate(-50%, -50%) scale(0.9)';
+                });
+                swipedCards.add(currentIndex);
+                if (swipedCards.size === cards.length) { setTimeout(goToPart4, 800); }
+            });
+        }
+        let scene4Started = false;
+        function goToPart4() {
+            if (scene4Started) return;
+            scene4Started = true;
+            part3.classList.add('hidden');
+            part4.classList.remove('hidden');
+            playScene4();
+        }
+        function playScene4() {
+            const avatar = document.getElementById('avatar');
+            const hand = document.getElementById('hand');
+            const finalTitle = document.getElementById('final-title');
+            const finalSubtitle = document.getElementById('final-subtitle');
+            const writingSfx = document.getElementById('writing-sfx');
+            avatar.classList.add('slide-in');
+            avatar.addEventListener('transitionend', () => {
+                hand.style.visibility = 'visible';
+                writingSfx.currentTime = 0;
+                writingSfx.play().catch(e => console.log("音效需要交互"));
+                let text = "生日快乐！";
+                let i = 0;
+                let handPos = 0;
+                function writeChar() {
+                    if (i < text.length) {
+                        finalTitle.textContent = text.slice(0, i + 1);
+                        handPos += 48;
+                        hand.style.transform = `translateX(${handPos}px) translateY(5px)`;
+                        i++;
+                        setTimeout(writeChar, 400);
+                    } else {
+                        hand.style.display = 'none';
+                        writingSfx.pause();
+                        finalSubtitle.style.opacity = '1';
+                        setTimeout(goToPart5, 2000);
+                    }
+                }
+                writeChar();
+            }, { once: true });
+        }
+
+        // --- Part 5 & 6 逻辑 ---
+        let scene5Started = false;
+        function goToPart5() {
+            if (scene5Started) return;
+            scene5Started = true;
+            part4.classList.add('hidden');
+            part5.classList.remove('hidden');
+            playScene5();
+        }
+        function playScene5() {
+            const walkingMouse = document.getElementById('walking-mouse');
+            const jumpscareMouse = document.getElementById('jumpscare-mouse');
+            walkingMouse.classList.add('wobble');
+            walkingMouse.addEventListener('animationend', () => {
+                walkingMouse.style.display = 'none';
+                jumpscareMouse.classList.add('show');
+                jumpscareMouse.addEventListener('animationend', () => { goToPart6(); }, { once: true });
+            }, { once: true });
+        }
+        let scene6Started = false;
+        function goToPart6() {
+            if (scene6Started) return;
+            scene6Started = true;
+            part5.classList.add('hidden');
+            part6.classList.remove('hidden');
+            playScene6();
+        }
+        function playScene6() {
+            const confessionText = document.getElementById('confession-text');
+            const cursor = document.getElementById('writing-cursor');
+            const slideshow = document.getElementById('slideshow');
+            const typingSfx = document.getElementById('typing-sfx');
+            const confessionScript = [
+                { text: "宝宝我真的很喜欢你啊", speed: 120, hold: 500 }, { text: "你真的很好", speed: 120, hold: 300 },
+                { text: "你是第1个让我感受到网友也可以变得如此亲密的人", speed: 100, hold: 300 }, { text: "第1个让我感受到燕云温暖的人", speed: 90, hold: 300 },
+                { text: "第1个陪我走过燕云一周年庆的人", speed: 80, hold: 300 }, { text: "第1个在我16岁给我送礼物的人", speed: 70, hold: 300 },
+                { text: "第1个永远好好阅读完我的消息并给予回回复的人", speed: 60, hold: 300 }, { text: "第1个和我聊oc创作文学政治三观的人", speed: 50, hold: 300 },
+                { text: "第1个让我觉得我永远可以对你无话不说的人……", speed: 40, hold: 800 }, { text: "真的超喜欢你", speed: 150, hold: 300 },
+                { text: "就是从那时候起 我觉得我也更喜欢自己了", speed: 150, hold: 300 }, { text: "不过我更想问有人像我这么幸运吗？!", speed: 150, hold: 3000 }
+            ];
+            const bgImages = ['./IMG_5431.png', './IMG_5430.png', './mmexport1774696267296.jpeg', './Screenshot_20260402_225335_com_tencent_mm_WxaLiteAppLiteUI.jpeg'];
+            let currentBgIndex = 0;
+            function cycleBackgrounds() {
+                if (bgImages.length === 0) return;
+                slideshow.style.backgroundImage = `url('${bgImages[currentBgIndex]}')`;
+                slideshow.classList.add('visible');
+                setTimeout(() => {
+                    slideshow.classList.remove('visible');
+                    currentBgIndex = (currentBgIndex + 1) % bgImages.length;
+                    setTimeout(cycleBackgrounds, 1500);
+                }, 4000);
+            }
+            let sentenceIndex = 0;
+            function writeSentence() {
+                if (sentenceIndex >= confessionScript.length) {
+                    cursor.style.display = 'none';
+                    typingSfx.pause();
+                    setTimeout(goToPart7, 1000);
+                    return;
+                }
+                const currentLine = confessionScript[sentenceIndex];
+                let charIndex = 0;
+                confessionText.textContent = '';
+                cursor.style.visibility = 'visible';
+                typingSfx.currentTime = 0;
+                typingSfx.play().catch(e => console.log("音效需要交互"));
+                const writingInterval = setInterval(() => {
+                    if (charIndex < currentLine.text.length) {
+                        confessionText.textContent += currentLine.text[charIndex];
+                        cursor.style.left = confessionText.offsetWidth + 'px';
+                        charIndex++;
+                    } else {
+                        clearInterval(writingInterval);
+                        cursor.style.visibility = 'hidden';
+                        typingSfx.pause();
+                        setTimeout(() => {
+                            confessionText.style.transition = 'opacity 0.3s';
+                            confessionText.style.opacity = '0';
+                            setTimeout(() => {
+                                confessionText.style.opacity = '1';
+                                confessionText.style.transition = 'none';
+                                sentenceIndex++;
+                                writeSentence();
+                            }, 300);
+                        }, currentLine.hold);
+                    }
+                }, currentLine.speed);
+            }
+            document.body.addEventListener('touchstart', () => { typingSfx.play().then(() => typingSfx.pause()); }, { once: true });
+            writeSentence();
+            setTimeout(cycleBackgrounds, 1000);
+        }
+
+        // --- Part 7 逻辑 ---
+        let scene7Started = false;
+        function goToPart7() {
+            if (scene7Started) return;
+            scene7Started = true;
+            part6.classList.add('slide-out-up');
+            part7.classList.remove('hidden');
+            playScene7();
+        }
+        function playScene7() {
+            const textWrapper = document.getElementById('final-text-wrapper');
+            const playBtn = document.getElementById('play-voice-btn');
+            const finalVoice = document.getElementById('final-voice');
+            setTimeout(() => {
+                const text = textWrapper.innerText;
+                textWrapper.innerHTML = '';
+                for (let i = 0; i < text.length; i++) {
+                    const charSpan = document.createElement('span');
+                    charSpan.innerText = text[i];
+                    charSpan.style.setProperty('--random-x', (Math.random() * 100 - 50) + 'px');
+                    charSpan.style.setProperty('--random-r', (Math.random() * 90 - 45) + 'deg');
+                    charSpan.style.animationDelay = (Math.random() * 0.5) + 's';
+                    charSpan.classList.add('wind-blow-char');
+                    textWrapper.appendChild(charSpan);
+                }
+                setTimeout(() => { playBtn.classList.add('visible'); }, 1500);
+            }, 3000);
+            playBtn.addEventListener('click', () => {
+                finalVoice.play();
+                playBtn.style.display = 'none';
+            });
+            finalVoice.addEventListener('ended', () => {
+                part7.classList.add('hidden');
+                part1.classList.remove('hidden');
+                part1.style.transform = 'translateY(0)';
+                document.getElementById('final-subtitle-text').textContent = 'end.';
+                const coverBtn = document.querySelector('.cover-btn');
+                if(coverBtn) coverBtn.style.display = 'none';
+                document.querySelector('.text-group').style.marginTop = '50px';
+            });
+            const star = document.getElementById('easter-egg-star');
+            const popup = document.getElementById('easter-egg-image-popup');
+            const popupImg = document.getElementById('easter-egg-img');
+            let clickCount = 0;
+            const easterEggImages = ['./Screenshot_20260403_164325_com_tencent_mm_WxaLiteAppLiteUI.jpeg', './lofter_1774909143872.webp', './mmexport1775136275824.jpeg'];
+            const starIcons = ['🌟', '💫', '💫'];
+            star.addEventListener('click', () => {
+                if (clickCount >= easterEggImages.length) return;
+                popupImg.src = easterEggImages[clickCount];
+                popup.classList.add('show');
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                    star.textContent = starIcons[clickCount];
+                    clickCount++;
+                }, 500);
+            });
+        }
+    </script>
+</body>
+</html>
